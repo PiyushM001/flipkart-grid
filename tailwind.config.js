@@ -1,6 +1,7 @@
 module.exports = {
   content: [
     "./src/App.js",
+    "./src/components/history.js"
   ],
   theme: {
     extend: {
