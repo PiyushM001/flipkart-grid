@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+const backend_url="https://flipkart-grid-backend-2.onrender.com";
 
 const HistoryPopup = () => {
     const [showPopup, setShowPopup] = useState(false);
@@ -9,7 +10,7 @@ const HistoryPopup = () => {
     const fetchHistory = async () => {
         setLoading(true);
         try {
-            const res = await axios.get('http://localhost:3001/products-history');
+            const res = await axios.get(`${backend_url}/products-history`);
             setHistoryData(res.data);
         } catch (error) {
             console.error('Error fetching history:', error.message);

@@ -16,7 +16,7 @@ import HistoryPopup from "./components/history";
 import HistoryPopup2 from "./components/history2";
 
 
-
+const backend_url="https://flipkart-grid-backend-2.onrender.com";
 
 const ImageUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -102,7 +102,7 @@ const ImageUpload = () => {
 
         if (product_details && product_details.length > 0) {
           axios
-            .post("http://localhost:3001/add-product", product_details[0], {
+            .post(`${backend_url}/add-product`, product_details[0], {
               headers: {
                 "Content-Type": "application/json",
               },
@@ -137,7 +137,7 @@ const ImageUpload = () => {
         if (fruit_vegetable_details && fruit_vegetable_details.length > 0) {
           axios
             .post(
-              "http://localhost:3001/add-fruit",
+              `${backend_url}/add-fruit`,
               fruit_vegetable_details[0],
               {
                 headers: {
