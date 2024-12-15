@@ -70,120 +70,275 @@ const ImageUpload = () => {
   //   }
   // }, [response, currentBatchIndex]);
 
-  const handleSubmit = async (event) => {
-    setanimatep("loaderscan relative");
+  // const handleSubmit = async (event) => {
+  //   setanimatep("loaderscan relative");
 
-    event.preventDefault();
+  //   event.preventDefault();
 
-    if (!selectedFile) {
-      alert("Please select a file or capture an image first!");
-      return;
-    }
+  //   if (!selectedFile) {
+  //     alert("Please select a file or capture an image first!");
+  //     return;
+  //   }
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    console.log("formData", formData);
+  //   const formData = new FormData();
+  //   formData.append("file", selectedFile);
+  //   console.log("formData", formData);
 
-    setLoading(true);
-    try {
-      const res = await axios.post(
-        "https://apihosting-cvjf.onrender.com/predict",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
+  //   setLoading(true);
+  //   try {
+  //     const res = await axios.post(
+  //       "https://apihosting-cvjf.onrender.com/predict",
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //         },
+  //       }
+  //     );
+  //     setResponse(res.data);
+
+  //     if (activeForm === "grocery") {
+  //       const { product_details } = res.data;
+
+  //       if (product_details && product_details.length > 0) {
+  //         axios
+  //           .post(`${backend_url}/add-product`, product_details[0], {
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //           })
+  //           .then(() => {
+  //             console.log("Product details saved to the database.");
+  //           })
+  //           .catch((error) => {
+  //             console.error("Failed to save product details:", error.message);
+  //           });
+  //       }
+
+  //       setSavedResults((prevResults) => [
+  //         { ...res.data,image: URL.createObjectURL(selectedFile), expanded: true, isNew: true }, // New element
+  //         ...prevResults.map((item) => ({ ...item, isNew: false })), // Previous elements
+  //       ]);
+  
+  //       setExpandedIndices((prevIndices) => [
+  //         ...prevIndices,
+  //         savedResults.length, // Automatically expand the new result
+  //       ]);
+
+
+
+
+
+
+
+  //     } else {
+  //       const { fruit_vegetable_details } = res.data;
+
+  //       if (fruit_vegetable_details && fruit_vegetable_details.length > 0) {
+  //         axios
+  //           .post(
+  //             `${backend_url}/add-fruit`,
+  //             fruit_vegetable_details[0],
+  //             {
+  //               headers: {
+  //                 "Content-Type": "application/json",
+  //               },
+  //             }
+  //           )
+  //           .then(() => {
+  //             console.log("Product details saved to the database.");
+  //           })
+  //           .catch((error) => {
+  //             console.error("Failed to save product details:", error.message);
+  //           });
+  //       }
+
+  //       setSavedResults2((prevResults) => [
+  //         { ...res.data,image: URL.createObjectURL(selectedFile), expanded: true, isNew: true }, // New element
+  //         ...prevResults.map((item) => ({ ...item, isNew: false })), // Previous elements
+  //       ]);
+  
+  //       setExpandedIndices2((prevIndices) => [
+  //         ...prevIndices,
+  //         savedResults2.length, // Automatically expand the new result
+  //       ]);
+
+
+
+
+
+  //     }
+
+  //     console.log(res.data);
+  //     setImage(null);
+     
+  //   } catch (error) {
+  //     console.error("Error uploading file:", error);
+  //     if (error.response) {
+  //       setResponse(error.response.data);
+  //     } else {
+  //       setResponse("Error uploading file");
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //     setanimatep("relative");
+  //   }
+  // };
+
+  // Validation function for grocery response
+const isValidGroceryResponse = (response) => {
+  const requiredFields = [
+    "timestamp",
+    "product_name",
+    "brand",
+    "MRP",
+    "expiry_date",
+    "product_count",
+    "is_expired",
+    "expected_life_span",
+  ];
+  return requiredFields.every((field) => field in response);
+};
+
+// Validation function for fruit/vegetable response
+const isValidFruitResponse = (response) => {
+  const requiredFields = [
+    "name",
+    "freshness_index",
+    "expected_life_span",
+    "timestamp",
+  ];
+  return requiredFields.every((field) => field in response);
+};
+
+const handleSubmit = async (event) => {
+  setanimatep("loaderscan relative");
+
+  event.preventDefault();
+
+  if (!selectedFile) {
+    alert("Please select a file or capture an image first!");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", selectedFile);
+  console.log("formData", formData);
+
+  setLoading(true);
+  try {
+    const res = await axios.post(
+      "https://apihosting-cvjf.onrender.com/predict",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    setResponse(res.data);
+
+    if (activeForm === "grocery") {
+      const { product_details } = res.data;
+
+      // Validate grocery response
+      if (
+        product_details &&
+        product_details.length > 0 &&
+        isValidGroceryResponse(product_details[0])
+      ) {
+        axios
+          .post(`${backend_url}/add-product`, product_details[0], {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          .then(() => {
+            console.log("Product details saved to the database.");
+          })
+          .catch((error) => {
+            console.error("Failed to save product details:", error.message);
+          });
+
+        setSavedResults((prevResults) => [
+          {
+            ...res.data,
+            image: URL.createObjectURL(selectedFile),
+            expanded: true,
+            isNew: true,
           },
-        }
-      );
-      setResponse(res.data);
+          ...prevResults.map((item) => ({ ...item, isNew: false })),
+        ]);
 
-      if (activeForm === "grocery") {
-        const { product_details } = res.data;
+        setExpandedIndices((prevIndices) => [
+          ...prevIndices,
+          savedResults.length,
+        ]);
+      } else {
+        alert("Invalid grocery response format , Please select phote corresponding to selected category");
+        return;
+      }
+    } else {
+      const { fruit_vegetable_details } = res.data;
 
-        if (product_details && product_details.length > 0) {
-          axios
-            .post(`${backend_url}/add-product`, product_details[0], {
+      // Validate fruit/vegetable response
+      if (
+        fruit_vegetable_details &&
+        fruit_vegetable_details.length > 0 &&
+        isValidFruitResponse(fruit_vegetable_details[0])
+      ) {
+        axios
+          .post(
+            `${backend_url}/add-fruit`,
+            fruit_vegetable_details[0],
+            {
               headers: {
                 "Content-Type": "application/json",
               },
-            })
-            .then(() => {
-              console.log("Product details saved to the database.");
-            })
-            .catch((error) => {
-              console.error("Failed to save product details:", error.message);
-            });
-        }
-
-        setSavedResults((prevResults) => [
-          { ...res.data,image: URL.createObjectURL(selectedFile), expanded: true, isNew: true }, // New element
-          ...prevResults.map((item) => ({ ...item, isNew: false })), // Previous elements
-        ]);
-  
-        setExpandedIndices((prevIndices) => [
-          ...prevIndices,
-          savedResults.length, // Automatically expand the new result
-        ]);
-
-
-
-
-
-
-
-      } else {
-        const { fruit_vegetable_details } = res.data;
-
-        if (fruit_vegetable_details && fruit_vegetable_details.length > 0) {
-          axios
-            .post(
-              `${backend_url}/add-fruit`,
-              fruit_vegetable_details[0],
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }
-            )
-            .then(() => {
-              console.log("Product details saved to the database.");
-            })
-            .catch((error) => {
-              console.error("Failed to save product details:", error.message);
-            });
-        }
+            }
+          )
+          .then(() => {
+            console.log("Product details saved to the database.");
+          })
+          .catch((error) => {
+            console.error("Failed to save product details:", error.message);
+          });
 
         setSavedResults2((prevResults) => [
-          { ...res.data,image: URL.createObjectURL(selectedFile), expanded: true, isNew: true }, // New element
-          ...prevResults.map((item) => ({ ...item, isNew: false })), // Previous elements
+          {
+            ...res.data,
+            image: URL.createObjectURL(selectedFile),
+            expanded: true,
+            isNew: true,
+          },
+          ...prevResults.map((item) => ({ ...item, isNew: false })),
         ]);
-  
+
         setExpandedIndices2((prevIndices) => [
           ...prevIndices,
-          savedResults2.length, // Automatically expand the new result
+          savedResults2.length,
         ]);
-
-
-
-
-
-      }
-
-      console.log(res.data);
-      setImage(null);
-     
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      if (error.response) {
-        setResponse(error.response.data);
       } else {
-        setResponse("Error uploading file");
+        alert("Invalid fruit/vegetable response format.");
+        return;
       }
-    } finally {
-      setLoading(false);
-      setanimatep("relative");
     }
-  };
+
+    console.log(res.data);
+    setImage(null);
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    if (error.response) {
+      setResponse(error.response.data);
+    } else {
+      setResponse("Error uploading file");
+    }
+  } finally {
+    setLoading(false);
+    setanimatep("relative");
+  }
+};
+
 
   const toggleExpand = (index) => {
     setExpandedIndices((prevIndices) =>

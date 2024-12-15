@@ -68,6 +68,9 @@ const HistoryPopup2 = () => {
                 <thead>
                   <tr>
                     <th className="border border-gray-300 px-4 py-2">SI no</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Timestamp
+                    </th>
                     
                     <th className="border border-gray-300 px-4 py-2">
                       Fruit Name
@@ -86,6 +89,7 @@ const HistoryPopup2 = () => {
                       <td className="border border-gray-300 px-4 py-2 text-center">
                         {index + 1}
                       </td>
+                      <td className="border px-4 py-2">{product.timestamp}</td>
                       <td className="border px-4 py-2">{product.name}</td>
 
                       <td className="border px-4 py-2">
