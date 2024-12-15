@@ -44,7 +44,7 @@ const HistoryPopup = () => {
             {/* Popup Modal */}
             {showPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black    bg-opacity-50 z-50">
-                    <div className="bg-[#242424] p-6 rounded-lg shadow-lg w-[70vw] overflow-y-scroll h-[60vh] relative">
+                    <div className="bg-[#242424] p-6 rounded-lg shadow-lg w-[70vw] overflow-y-scroll scrollbar-hide h-[60vh] relative">
                         {/* Close Button */}
                         <button
                             onClick={handleClosePopup}

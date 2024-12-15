@@ -275,7 +275,7 @@ const handleSubmit = async (event) => {
           savedResults.length,
         ]);
       } else {
-        alert("Invalid grocery response format , Please select phote corresponding to selected category");
+        alert("Invalid grocery response format , Please select photo corresponding to selected category");
         return;
       }
     } else {
@@ -699,6 +699,9 @@ const handleSubmit = async (event) => {
                                   <th className="border px-4 py-2 text-left">
                                     Expected Life Span
                                   </th>
+                                  <th className="border px-4 py-2 text-left">
+                                    Description
+                                  </th>
                                   
                                 </tr>
                               </thead>
@@ -714,6 +717,9 @@ const handleSubmit = async (event) => {
                                     </td>
                                     <td className="border px-4 py-2">
                                       {product.expected_life_span}
+                                    </td>
+                                    <td className="border px-4 py-2">
+                                      {product.description}
                                     </td>
                                    
                                   </tr>
