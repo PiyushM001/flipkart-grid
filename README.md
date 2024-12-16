@@ -41,7 +41,7 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 -----
 **System Workflow**
 
-![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.001.png)
+![Alt Text](src/images/flow.png)
 
 1. **User Interaction**:
    1. Users interact with a **React-based UI** to upload images for analysis.
@@ -67,17 +67,19 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 1. **Home Page**:
 
 ![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.002.png)**    
+![Alt Text](src/images/homepage.png)
 
 1. **Image Upload/Capture**:
 
-   ![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.003.png)            
+   ![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.003.png)    
+   ![Alt Text](src/images/upload.png)        
 
 1. **Analysis Results**:
    1. Results are displayed dynamically in tables:
       1. ![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.004.png)**Grocery Table(**Along with input image**)**:
 
 
-
+![Alt Text](src/images/result.png)
 
 
 
@@ -88,11 +90,13 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 
    ![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.005.png)
 
-
+![Alt Text](src/images/fruits.png)
 
 
 1. **History**:
    1. ![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.006.png)![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.007.png)Users can view all previously scanned items from the corresponding database.
+   ![Alt Text](src/images/history1.png)
+   ![Alt Text](src/images/history2.png)
 
 
 **Backend**
