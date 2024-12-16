@@ -141,5 +141,7 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 - **Response Format**: 
   1. Returns data in JSON format for easy integration with front-end applications or further analysis.
   1. Error handling ensures smooth retrieval, even if the database operation fails.
+  ![Alt Text](src/images/endpoints.png)
+
 
 ![](Aspose.Words.beb964a5-f4fb-43d1-b52c-5ae96e725be2.008.png)
