@@ -275,7 +275,7 @@ const handleSubmit = async (event) => {
           savedResults.length,
         ]);
       } else {
-        alert("Invalid grocery response format , Please select photo corresponding to selected category");
+        alert("Invalid input format , Please select photo corresponding to selected category");
         return;
       }
     } else {
@@ -319,7 +319,7 @@ const handleSubmit = async (event) => {
           savedResults2.length,
         ]);
       } else {
-        alert("Invalid fruit/vegetable response format.");
+        alert("Invalid input format , Please select photo corresponding to selected category.");
         return;
       }
     }
@@ -384,7 +384,7 @@ const handleSubmit = async (event) => {
               </button>
 
               <a
-                className={`px-8 py-2 ${
+                className={`px-8 py-2 cursor-pointer ${
                   activeForm === "fruits"
                     ? "border-b-[3px] border-blue-500 text-white"
                     : " text-[#6d6d6d]"
