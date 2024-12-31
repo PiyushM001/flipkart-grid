@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-const backend_url="https://flipkart-grid-backend-2.onrender.com";
+import { MdQrCodeScanner } from "react-icons/md";
+import { GiFruitBowl } from "react-icons/gi";
+import { MdLogout } from "react-icons/md";
+import { MdOutlineHistory } from "react-icons/md";
+import { LuScanLine } from "react-icons/lu";
+import { MdOutlineDashboard } from "react-icons/md";
+import { AiOutlineProduct } from "react-icons/ai";
+import { Link } from "react-router-dom";
+import OrderHistory from "./producthistory";
+import FruitHistory from "./fruithistory";
+const backend_url = "https://flipkart-grid-backend-2.onrender.com";
 
-const HistoryPopup2 = () => {
-  const [showPopup, setShowPopup] = useState(false);
+const HistoryPopup2= () => {
   const [loading, setLoading] = useState(false);
   const [historyData, setHistoryData] = useState([]);
 
@@ -19,93 +28,65 @@ const HistoryPopup2 = () => {
     }
   };
 
-  const handleShowPopup = () => {
-    setShowPopup(true);
+  useEffect(() => {
+    // Fetch data from the API
     fetchHistory();
-  };
-
-  const handleClosePopup = () => {
-    setShowPopup(false);
-    setHistoryData([]);
-  };
+  }, []);
 
   return (
-    <div>
-      {/* View History Button */}
-      <div className="w-full flex justify-end">
-        <button
-          onClick={handleShowPopup}
-          className="bg-blue-500 text-white px-4 m-2 mr-5 py-2 rounded"
-        >
-          View History
-        </button>
-      </div>
-
+    <div className="h-[100vh] w-full">
       {/* Popup Modal */}
-      {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black    bg-opacity-50 z-50">
-          <div className="bg-[#242424] p-6 rounded-lg shadow-lg w-[70vw] overflow-y-scroll scrollbar-hide h-[60vh] relative">
-            {/* Close Button */}
-            <button
-              onClick={handleClosePopup}
-              className="absolute top-3 right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+
+      <div className="h-[100vh] w-full flex  bg-black     ">
+        <div className="bg-[#1e1f24] text-white h-full w-[220px] flex-shrink-0">
+          <div className="h-[7rem] flex justify-center items-center">
+            Flipkart Grid 6.0
+          </div>
+          <div className="flex flex-col space-y-6 px-4">
+            <Link to="/dashboard" className="flex items-center px-2 py-2">
+              <MdOutlineDashboard className="text-2xl" />
+              <span className="pl-2">Dashboard</span>
+            </Link>
+            <Link to="/home" className="flex items-center px-2 py-2">
+              <LuScanLine className="text-2xl" />
+              <span className="pl-2">Scan</span>
+            </Link>
+
+            <Link className="flex items-center px-2 py-2">
+              <MdQrCodeScanner className="text-2xl" />
+              <span className="pl-2">QR-Scan</span>
+            </Link>
+
+            <Link
+              to="/history/products"
+              className="flex items-center px-2 py-2 w-full bg-white rounded-lg"
             >
-              &times;
-            </button>
-
-            {/* Modal Title */}
-            <h2 className="text-xl font-bold mb-4 text-center">
-              Products - History
-            </h2>
-
-            {/* Loader */}
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="loader border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
-              </div>
-            ) : (
-              <table className="table-auto w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr>
-                    <th className="border border-gray-300 px-4 py-2">SI no</th>
-                    <th className="border border-gray-300 px-4 py-2">
-                      Timestamp
-                    </th>
-                    
-                    <th className="border border-gray-300 px-4 py-2">
-                      Fruit Name
-                    </th>
-                    <th className="border border-gray-300 px-4 py-2">
-                      Freshness Index
-                    </th>
-                    <th className="border border-gray-300 px-4 py-2">
-                      Expected Life Span
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historyData.map((product, index) => (
-                    <tr key={index}>
-                      <td className="border border-gray-300 px-4 py-2 text-center">
-                        {index + 1}
-                      </td>
-                      <td className="border px-4 py-2">{product.timestamp}</td>
-                      <td className="border px-4 py-2">{product.name}</td>
-
-                      <td className="border px-4 py-2">
-                        {product.freshness_index}
-                      </td>
-                      <td className="border px-4 py-2">
-                        {product.expected_life_span}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+              <MdOutlineHistory className="text-2xl text-[#141517]" />
+              <span className="pl-2 text-[#141517] font-bold">History</span>
+            </Link>
+          </div>
+          <div className="w-full h-px bg-[#7e7e7e] my-6"></div>
+          <div className="flex items-center px-4">
+            <MdLogout className="text-2xl" />
+            <span className="pl-4">Log-Out</span>
           </div>
         </div>
-      )}
+
+
+
+        <div className="h-[100vh] w-full  text-[white]">
+
+        {loading ? (
+              <div className="h-[100vh] flex items-center justify-center">
+                <div className="loader  rounded-full  animate-spin"></div>
+              </div>
+            ) : (
+         
+          <FruitHistory historyData={historyData} />
+
+        )}
+        </div>
+      </div>
     </div>
   );
 };

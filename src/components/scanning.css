@@ -6,7 +6,7 @@
       linear-gradient(to bottom right,#0000 calc(50% - 40px),#fff 50%,#0000 calc(50% + 40px)) 
       bottom right/calc(200% + 80px) calc(200% + 80px) 
       rgba(119, 104, 77, 0);
-    animation: l8 3s infinite ;
+    animation: l8 1.5s infinite ;
     z-index: 10000;
   }
   @keyframes l8 {
