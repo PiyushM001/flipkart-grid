@@ -25,7 +25,7 @@ export default function Dashboard() {
     // Fetch data from the API
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3001/order-data"); // Replace with your API endpoint
+        const response = await fetch("https://flipkart-grid-backend-2.onrender.com/order-data"); // Replace with your API endpoint
         const data = await response.json();
         console.log("dataaaa", data);
         setGraphData(
@@ -50,7 +50,7 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/category-piechart"
+          "https://flipkart-grid-backend-2.onrender.com/category-piechart"
         ); // Adjust API URL as needed
         const chartData = response.data;
 

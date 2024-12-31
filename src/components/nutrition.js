@@ -23,8 +23,8 @@ import { Link } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import NutritionInfo from "./nutritiontable";
 const name = localStorage.getItem("name");
-// const backend_url="https://flipkart-grid-backend-2.onrender.com";
-const backend_url = "http://localhost:3001";
+ const backend_url="https://flipkart-grid-backend-2.onrender.com";
+//const backend_url = "http://localhost:3001";
 
 const Nutrition = () => {
   const [selectedFile, setSelectedFile] = useState(null);
