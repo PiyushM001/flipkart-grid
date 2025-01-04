@@ -6,7 +6,6 @@
 
 The system integrates a React-based web interface (deployed on **Netlify**) with a Flask/FastAPI backend powered by a fine-tuned **LLM (Gemini)** for predictions. All processed data is dynamically stored in MongoDB databases for future reference.
 
-![ref1]
 
 🚀 **Web application link: [https://flipkrt-grid-mars.netlify.app/**](https://flipkrt-grid-mars.netlify.app/)**
 
@@ -14,7 +13,6 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 
 **🚀** **Practical Usage Link: [Video Link**](https://drive.google.com/file/d/1RyE0Gsdrise3Rw0hRBiOBsdiI9FCeukP/view)**
 
-![ref1]
 
 **✨ Features**
 
@@ -33,7 +31,6 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 - **Barcode Decoding**: Decodes barcodes from uploaded images.
 - **Nutritional Analysis and Ingredients** : Displays nutrient contents and ingredients  of a product upon image upload.
 
-![ref1]
 
 **Tech Stack**
 
@@ -52,7 +49,6 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 - **Node**.JS : backend 
 - **Express.js**: Middleware for backend APIs.
 
-![ref1]
 
 **System Workflow**
 
@@ -79,7 +75,6 @@ The system integrates a React-based web interface (deployed on **Netlify**) with
 
 
 ![Alt Text](src/images/final%20imahe%20.png)
-![ref1]
 
 **Frontend**
 
@@ -251,7 +246,7 @@ A pie chart categorizes processed items (e.g., Dairy, Snacks, Fruits/Vegetables)
   1. The data is stored in MongoDB Atlas using Product and Fruit collections when endpoints /add-product and /add-fruit are called.
   2. Data persistence ensures records are saved for future access.
 
-![ref1]
+
 
 1. **History Retrieval**
 
@@ -265,4 +260,3 @@ A pie chart categorizes processed items (e.g., Dairy, Snacks, Fruits/Vegetables)
 ![Alt Text](src/images/endpoints.png)
 
 
-[ref1]: Aspose.Words.db60b9e8-4f20-4709-922c-1d5acfddc531.001.png
