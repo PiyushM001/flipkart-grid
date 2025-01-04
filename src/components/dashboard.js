@@ -3,11 +3,12 @@ import axios from "axios";
 import MyPieChart from "./pichart";
 import LineGraph from "./linegraph";
 import { Toaster, toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 import { LuScanLine } from "react-icons/lu";
 import { GoHome } from "react-icons/go";
 import { MdQrCodeScanner } from "react-icons/md";
 import { GiFruitBowl } from "react-icons/gi";
+
 import { MdLogout } from "react-icons/md";
 import { MdOutlineHistory } from "react-icons/md";
 import { MdOutlineDashboard } from "react-icons/md";
@@ -45,6 +46,11 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
+  const navigate = useNavigate();
+  const logoutfun=()=>{
+    localStorage.setItem("name", "");
+    navigate("/");
+    }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,9 +91,14 @@ export default function Dashboard() {
             <LuScanLine className="text-2xl" />
             <span className="pl-2">Scan</span>
           </Link>
-          <Link className="flex items-center px-2 py-2">
+
+                    <Link to='/nutrition' className="flex items-center px-2 py-2">
+                    <LuScanLine className="text-2xl" />
+                      <span className="pl-2">Nutrition</span>
+                    </Link>
+          <Link to='/barcode'  className="flex items-center px-2 py-2">
             <MdQrCodeScanner className="text-2xl" />
-            <span className="pl-2">QR-Scan</span>
+            <span className="pl-2">BAR-Code</span>
           </Link>
           <Link to='/history/products' className="flex items-center px-2 py-2">
             <MdOutlineHistory className="text-2xl" />
@@ -95,7 +106,7 @@ export default function Dashboard() {
           </Link>
         </div>
         <div className="w-full h-px bg-[#7e7e7e] my-6"></div>
-        <div className="flex items-center px-4">
+        <div onClick={logoutfun} className="flex items-center px-4">
           <MdLogout className="text-2xl" />
           <span className="pl-4">Log-Out</span>
         </div>

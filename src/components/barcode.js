@@ -17,8 +17,7 @@ import { MdOutlineHistory } from "react-icons/md";
 import { MdLogout } from "react-icons/md";
 import { MdOutlineDashboard } from "react-icons/md";
 import imgflip from "../images/flipkart2.jpg";
-import HistoryPopup from "./history";
-import HistoryPopup2 from "./history2";
+
 import { Link , useNavigate} from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import NutritionInfo from "./nutritiontable";
@@ -26,7 +25,7 @@ const name = localStorage.getItem("name");
  const backend_url="https://flipkart-grid-backend-2.onrender.com";
 //const backend_url = "http://localhost:3001";
 
-const Nutrition = () => {
+const Barcode = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -178,18 +177,18 @@ const Nutrition = () => {
 
           <Link
             to="/nutrition"
-            className="flex items-center px-2 py-2 w-full bg-white rounded-lg"
+            className="flex items-center px-2 py-2 "
           >
-            <LuScanLine className="text-2xl text-[#141517]" />
-            <span className="pl-2 text-[#141517] font-bold">Nutrition</span>
+            <LuScanLine className="text-2xl " />
+            <span className="pl-2 ">Nutrition</span>
           </Link>
 
-          <Link to='/barcode'  className="flex items-center px-2 py-2">
-            <MdQrCodeScanner className="text-2xl" />
-            <span className="pl-2">BAR-Code</span>
+          <Link to='/barcode' className="flex items-center px-2 py-2 w-full bg-white rounded-lg ">
+            <MdQrCodeScanner className="text-2xl text-[#141517]" />
+            <span className="pl-2 text-[#141517] font-bold">BAR-Code</span>
           </Link>
           <Link to="/history/products" className="flex items-center px-2 py-2">
-            <MdOutlineHistory className="text-2xl" />
+            <MdOutlineHistory className="text-2xl " />
             <span className="pl-2">History</span>
           </Link>
         </div>
@@ -298,4 +297,4 @@ const Nutrition = () => {
     </div>
   );
 };
-export default Nutrition;
+export default Barcode;

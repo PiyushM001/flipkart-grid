@@ -17,7 +17,7 @@ const DonutChart = ({ data, colors }) => {
         textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
       >
-        {data[index].name} ({`${(percent * 100).toFixed(0)}%`})
+         ({`${(percent * 100).toFixed(0)}%`})
       </text>
     );
   };
@@ -32,12 +32,12 @@ const DonutChart = ({ data, colors }) => {
           nameKey="name"
           cx="50%"
           cy="50%"
-          innerRadius={50}
-          outerRadius={100}
+          innerRadius={70}
+          outerRadius={130}
            fill="white"
           paddingAngle={2}
           label={renderCustomizedLabel}
-          labelLine={true} // Enable label lines for connecting legends
+          // labelLine={true} // Enable label lines for connecting legends
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />

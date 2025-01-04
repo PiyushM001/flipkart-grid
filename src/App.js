@@ -6,6 +6,7 @@ import Dashboard from './components/dashboard';
 import HistoryPopup from './components/history';
 import HistoryPopup2 from './components/history2';
 import Nutrition from './components/nutrition';
+import Barcode from './components/barcode';
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<Login />} />
+        <Route path="/barcode" element={<Barcode/>} />
+
         <Route path="/dashboard" element={<Dashboard/>} />
         <Route path="/history/products" element={<HistoryPopup/>} />
         <Route path="/history/fruits" element={<HistoryPopup2/>} />

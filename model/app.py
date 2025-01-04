@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 # Configure the API key
-api_key = 'AIzaSyC-Drykt7wZusUPlBvH6ConDsNlxeX1TQo'  # Replace with your actual API key
+api_key = 'AIzaSyCInFXyhcoFcLLR7FZKyF5uatB_NPT_hbw'  # Replace with your actual API key
 genai.configure(api_key=api_key)
 
 # Define the app object
@@ -36,8 +36,9 @@ def upload_image(image_bytes):
 
 # Classify image content (fruits/vegetables or others)
 def classify_image(sample_file):
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest")
-    response = model.generate_content([sample_file, "check whther it is an image of vegetable/fruit , do not get confused by the images of fruits and vegetables that are there on the packet of packaged food itmes? Answer 'yes' or 'no' only."])
+    model = genai.GenerativeModel(model_name="gemini-1.5-flash-latest")
+    response = model.generate_content([sample_file, "check whether it is an image of vegetable/fruit , do not get confused by the images of fruits and vegetables that are there on the packet of packaged food itmes? Answer 'yes' or 'no' only."])
+    
     classification = response.text.strip().lower()
     return classification == "yes"
 
@@ -45,26 +46,28 @@ def classify_image(sample_file):
 # Predict details for multiple fruits/vegetables
 def predict_multiple_fruit_or_vegetable_details(sample_file):
     """
-    Predict the name, freshness index, and expected life span of each fruit/vegetable in the image.
+    Predict the name, freshness index, and expected life span(realistic or practical number of days it is suitable to eat ) of each type of fruit/vegetable in the image.If multiple fruits/vegetables of same kind, give average freshness index of them.Also give resoning-visual description like colour,any blemishes or spots,texture etc. for the specified freshness index. Also give the number of fruits /vegetables whose freshness index is less than or equal to 3.
+
     """
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest")
+    model = genai.GenerativeModel(model_name="gemini-1.5-flash-latest")
     response = model.generate_content([
         sample_file,
-        """List the name, freshness index (scale of 1-10), and expected life span ((1.6 * freshness index)rounded off to nearest whole number) for each fruit/vegetable in the image. 
-        Return the result in JSON format like this:
+        """List the name, freshness index (scale of 1-10), and expected life span (realistic or practical number of days it is suitable to eat ) for each type of fruit/vegetable in the image.If multiple fruits/vegetables of same kind, give average freshness index of them.Also give resoning-visual description  like colour,any blemishes or spots,texture etc. for the specified freshness index
+        .Return the result in JSON format like this:
         {
             "items": [
-                {"name": "Apple", "freshness_index": 9, "expected_life_span": 14.4},
-                {"name": "Banana", "freshness_index": 6, "expected_life_span": 9.6}
-            ]
-        }"""
+                {"name": "Apple", "freshness_index": 9, "expected_life_span": 7,"description":"bright red colour,firm texture with no signs of rottenness"},
+                 {"name": "Banana", "freshness_index": 6, "expected_life_span": 3,"description":"some black spots present on the skin of bananas ,texture slightly less firm"}
+             ],
+        }"""
     ])
+    
     
     response_text = response.text.strip()
     print(f"Generated Fruits/Vegetables Details Response: {response_text}")  # Debugging output
     
     try:
-        if response_text.startswith("json") and response_text.endswith(""):
+        if response_text.startswith("```json") and response_text.endswith("```"):
             response_text = response_text[7:-3].strip()
         parsed_response = json.loads(response_text)
         items = parsed_response.get("items", [])
@@ -84,17 +87,18 @@ def add_timestamp(details):
 
 # Generate product details for non-fruits/vegetables
 def generate_product_details(sample_file):
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest")
+    model = genai.GenerativeModel(model_name="gemini-1.5-flash-latest")
     response = model.generate_content([
         sample_file,  
     """For each product in the image, list:
     - product name
     - brand
     - MRP
-    - expiry date
+    - expiry date in format dd-mm-yyyy
     - product count which will be minimum 1 
-    - whether it is expired ("YES" or "NO")
-    - expected life span in days (subtract today's date from the expiry date, or "NA" if expired)
+    - whether it is expired ("YES" or "NO" if expiry date detected, else NA)
+    - expected life span in days (Calculate the number of days remaining until the expiry date detected in format dd-mm-yyyy from date 05-01-2025, or "NA" if expired)
+    - category of the product among the following list of categories: {"personal care", "household care", "dairy", "staples", "snacks and beverages", "packaged food"}. Return 'NA' if the category is not determined.
 
     If some details are not found, fill with "NA". Return data in JSON format like this:
     {
@@ -103,19 +107,21 @@ def generate_product_details(sample_file):
                 "product_name": "Tata Salt",
                 "brand": "Tata",
                 "MRP": "60RS",
-                "expiry_date": "2024-12-25",
+                "expiry_date": "25-12-2024",
                 "product_count": 1,
                 "is_expired": "NO",
-                "expected_life_span": 15
+                "expected_life_span": 9,
+                "category":"staples"
             },
             {
                 "product_name": "Maggi",
                 "brand": "Nestle",
                 "MRP": "12RS",
-                "expiry_date": "2024-12-15",
+                "expiry_date": "25-12-2024",
                 "product_count": 1,
                 "is_expired": "NO",
-                "expected_life_span": 5
+                "expected_life_span": 9,
+                "category":"packaged food"
             }
         ]
     }I want only these details, no more text."""
@@ -133,7 +139,7 @@ def add_timestamps_to_products(products):
 
 def parse_response_to_dataframe(response_text):
     try:
-        if response_text.startswith("json") and response_text.endswith(""):
+        if response_text.startswith("```json") and response_text.endswith("```"):
             response_text = response_text[7:-3].strip()
         # Attempt to parse the response text as JSON
         products_list = json.loads(response_text)
@@ -197,5 +203,5 @@ async def predict_image(file: UploadFile = File(...)):
         return {"error": str(e)}
 
 # Run the API with Uvicorn
-if _name_ == '_main_':
+if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8000)

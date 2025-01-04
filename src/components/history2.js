@@ -7,7 +7,7 @@ import { MdOutlineHistory } from "react-icons/md";
 import { LuScanLine } from "react-icons/lu";
 import { MdOutlineDashboard } from "react-icons/md";
 import { AiOutlineProduct } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 import OrderHistory from "./producthistory";
 import FruitHistory from "./fruithistory";
 const backend_url = "https://flipkart-grid-backend-2.onrender.com";
@@ -15,6 +15,11 @@ const backend_url = "https://flipkart-grid-backend-2.onrender.com";
 const HistoryPopup2= () => {
   const [loading, setLoading] = useState(false);
   const [historyData, setHistoryData] = useState([]);
+  const navigate = useNavigate();
+  const logoutfun=()=>{
+    localStorage.setItem("name", "");
+    navigate("/");
+    }
 
   const fetchHistory = async () => {
     setLoading(true);
@@ -51,10 +56,11 @@ const HistoryPopup2= () => {
               <LuScanLine className="text-2xl" />
               <span className="pl-2">Scan</span>
             </Link>
+            
 
-            <Link className="flex items-center px-2 py-2">
+            <Link  to='/barcode' className="flex items-center px-2 py-2">
               <MdQrCodeScanner className="text-2xl" />
-              <span className="pl-2">QR-Scan</span>
+              <span className="pl-2">BAR-Code</span>
             </Link>
 
             <Link
@@ -66,7 +72,7 @@ const HistoryPopup2= () => {
             </Link>
           </div>
           <div className="w-full h-px bg-[#7e7e7e] my-6"></div>
-          <div className="flex items-center px-4">
+          <div onClick={logoutfun} className="flex items-center px-4">
             <MdLogout className="text-2xl" />
             <span className="pl-4">Log-Out</span>
           </div>

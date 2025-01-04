@@ -19,12 +19,12 @@ import { MdOutlineDashboard } from "react-icons/md";
 import imgflip from "../images/flipkart2.jpg";
 import HistoryPopup from "./history";
 import HistoryPopup2 from "./history2";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 const name = localStorage.getItem("name");
 
-const backend_url="https://flipkart-grid-backend-2.onrender.com";
-//const backend_url = "http://localhost:3001";
+//const backend_url="https://flipkart-grid-backend-2.onrender.com";
+const backend_url = "http://localhost:3001";
 
 const Home = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -37,6 +37,16 @@ const Home = () => {
   const [image, setImage] = useState(null);
   const [animatep, setanimatep] = useState("relative");
   const [activeForm, setActiveForm] = useState("grocery");
+  const navigate = useNavigate();
+  const logoutfun = () => {
+    localStorage.setItem("name", "");
+    navigate("/");
+  };
+
+  const formatDescription = (text) => {
+    // Split the description into an array of points
+    return text.split(".").filter((point) => point.trim() !== "");
+  };
 
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   // const [currentBatchIndex, setCurrentBatchIndex] = useState(0); // Track the current batch
@@ -195,14 +205,13 @@ const Home = () => {
       "is_expired",
       "category",
       "expected_life_span",
-      
     ];
     return requiredFields.every((field) => field in response);
   };
 
   // Validation function for fruit/vegetable response
   const isValidFruitResponse = (response) => {
-    console.log("resppppp222",response);
+    console.log("resppppp222", response);
     const requiredFields = [
       "name",
       "freshness_index",
@@ -226,11 +235,11 @@ const Home = () => {
     const formData = new FormData();
     formData.append("file", selectedFile);
     console.log("formData", formData);
-   // "https://apihosting-cvjf.onrender.com/",
+    // "https://apihosting-cvjf.onrender.com/",
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://render-flask-app-grid.onrender.com/predict",
+        "https://apihosting-cvjf.onrender.com/predict",
         formData,
         {
           headers: {
@@ -249,7 +258,7 @@ const Home = () => {
           product_details.length > 0 &&
           isValidGroceryResponse(product_details[0])
         ) {
-          console.log(product_details)
+          console.log(product_details);
           axios
             .post(`${backend_url}/add-product`, product_details, {
               headers: {
@@ -288,7 +297,6 @@ const Home = () => {
 
         // Validate fruit/vegetable response
         if (
-        
           fruit_vegetable_details &&
           fruit_vegetable_details.length > 0 &&
           isValidFruitResponse(fruit_vegetable_details[0])
@@ -364,172 +372,155 @@ const Home = () => {
 
   return (
     <div className=" flex w-full  h-[100vh] ">
+      <Toaster position="top-center" reverseOrder={false} />
 
-<Toaster position="top-center" reverseOrder={false} />
-
-<div className="bg-[#1e1f24] text-white h-full w-[220px] flex-shrink-0">
-        <div className="h-[7rem] flex justify-center items-center">Flipkart Grid 6.0</div>
+      <div className="bg-[#1e1f24] text-white h-full w-[220px] flex-shrink-0">
+        <div className="h-[7rem] flex justify-center items-center">
+          Flipkart Grid 6.0
+        </div>
         <div className="flex flex-col space-y-6 px-4">
-        <Link to="/dashboard" className="flex items-center px-2 py-2">
-        <MdOutlineDashboard  className="text-2xl" />
+          <Link to="/dashboard" className="flex items-center px-2 py-2">
+            <MdOutlineDashboard className="text-2xl" />
             <span className="pl-2">Dashboard</span>
           </Link>
-          <Link to="/home"  className="flex items-center px-2 py-2 w-full bg-white rounded-lg">
-          <LuScanLine className="text-2xl text-[#141517]" />
+          <Link
+            to="/home"
+            className="flex items-center px-2 py-2 w-full bg-white rounded-lg"
+          >
+            <LuScanLine className="text-2xl text-[#141517]" />
             <span className="pl-2 text-[#141517] font-bold">Scan</span>
           </Link>
 
-          <Link to='/nutrition' className="flex items-center px-2 py-2">
-          <LuScanLine className="text-2xl" />
+          <Link to="/nutrition" className="flex items-center px-2 py-2">
+            <LuScanLine className="text-2xl" />
             <span className="pl-2">Nutrition</span>
           </Link>
-          
-         
-          <Link className="flex items-center px-2 py-2">
+
+          <Link to="/barcode" className="flex items-center px-2 py-2">
             <MdQrCodeScanner className="text-2xl" />
-            <span className="pl-2">QR-Scan</span>
+            <span className="pl-2">BAR-Code</span>
           </Link>
-          <Link  to='/history/products' className="flex items-center px-2 py-2">
+          <Link to="/history/products" className="flex items-center px-2 py-2">
             <MdOutlineHistory className="text-2xl" />
             <span className="pl-2">History</span>
           </Link>
         </div>
         <div className="w-full h-px bg-[#7e7e7e] my-6"></div>
-        <div className="flex items-center px-4">
+        <div onClick={logoutfun} className="flex items-center px-4">
           <MdLogout className="text-2xl" />
           <span className="pl-4">Log-Out</span>
         </div>
       </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <div className=" overflow-y-scroll bg-[#141517] scrollbar-hide border-r-[2px] border-[#1e1f24] ">
-          <img className="" src={imgflip}></img>
-          {/* {activeForm === "grocery" ? <HistoryPopup /> : <HistoryPopup2 />} */}
-          {activeForm === "fruits" ? (
-            <div>
-              {savedResults2.map((result, index) => (
-                <div
-                  key={index}
-                  className={
-                    result.isNew
-                      ? "border border-[#494949]  rounded-md m-4 "
-                      : "border border-gray-600  m-6 rounded-md"
-                  }
-                >
-                  <div className="flex justify-between p-4 border-b-[5px] text-[white] border-[#2d2f36] bg-[#1e1f24]">
-                    <div className="flex ">
-                      <h3 className="font-bold text-[1rem]">
-                        Order Number: {generateOrderNumber()}
-                      </h3>
-                      <h3 className="text-xl font-semibold ml-5 text-[1rem]">
-                        Time Stamp:{" "}
-                        {result.fruit_vegetable_details[0].timestamp}
-                      </h3>
-                    </div>
-                    <button
-                      onClick={() => toggleExpand2(index)}
-                      className="text-blue-400"
-                    >
-                      {expandedIndices2.includes(index) ? (
-                        <TbWindowMinimize className="text-[1.5rem]" />
-                      ) : (
-                        <IoMdExpand className="text-[1.5rem]" />
-                      )}
-                    </button>
+        <img className="" src={imgflip}></img>
+        {/* {activeForm === "grocery" ? <HistoryPopup /> : <HistoryPopup2 />} */}
+        {activeForm === "fruits" ? (
+          <div>
+            {savedResults2.map((result, index) => (
+              <div
+                key={index}
+                className={
+                  result.isNew
+                    ? "border border-[#494949]  rounded-md m-4 "
+                    : "border border-gray-600  m-6 rounded-md"
+                }
+              >
+                <div className="flex justify-between p-4 border-b-[5px] text-[white] border-[#2d2f36] bg-[#1e1f24]">
+                  <div className="flex ">
+                    <h3 className="font-bold text-[1rem]">
+                      Order Number: {generateOrderNumber()}
+                    </h3>
+                    <h3 className="text-xl font-semibold ml-5 text-[1rem]">
+                      Time Stamp: {result.fruit_vegetable_details[0].timestamp}
+                    </h3>
                   </div>
+                  <button
+                    onClick={() => toggleExpand2(index)}
+                    className="text-blue-400"
+                  >
+                    {expandedIndices2.includes(index) ? (
+                      <TbWindowMinimize className="text-[1.5rem]" />
+                    ) : (
+                      <IoMdExpand className="text-[1.5rem]" />
+                    )}
+                  </button>
+                </div>
 
-                  {expandedIndices2.includes(index) && (
-                    <div className="p-4 bg-[#1e1f24]">
-                      <div className="grid grid-cols-[1fr,2fr] gap-6 ">
-                        <div className="space-y-4 border-r-[1px] pr-4 border-gray-600">
-                          <div className="border-b-[1px] pb-4 border-gray-600">
-                            {result.image && (
-                              <div className="">
-                                <img
-                                  src={result.image}
-                                  alt="Uploaded"
-                                  className="w-64 h-64 object-contain mx-auto rounded-md"
-                                />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Order Number */}
-                          
+                {expandedIndices2.includes(index) && (
+                  <div className="p-4 bg-[#1e1f24]">
+                    <div className="grid grid-cols-[1fr,2fr] gap-6 ">
+                      <div className="space-y-4 border-r-[1px] pr-4 border-gray-600">
+                        <div className="border-b-[1px] pb-4 border-gray-600">
+                          {result.image && (
+                            <div className="">
+                              <img
+                                src={result.image}
+                                alt="Uploaded"
+                                className="w-64 h-64 object-contain mx-auto rounded-md"
+                              />
+                            </div>
+                          )}
                         </div>
 
-                        {/* Right Side: Product Matching Table */}
-                        <div className="space-y-4">
-                          <div className="border-b pb-4 border-gray-600">
-                            <h4 className="text-[white]  mb-2 text-center">
-                              Image Details
-                            </h4>
-                            <table className="w-full table-auto border-collapse border border-gray-600">
-                              <thead>
-                                <tr className="bg-[#33353d] text-[white]">
-                                  <th className="border px-4 py-2 text-left">
-                                    fruit Name
-                                  </th>
+                        {/* Order Number */}
+                      </div>
 
-                                  <th className="border px-4 py-2 text-left">
-                                    Freshness Index
-                                  </th>
-                                  <th className="border px-4 py-2 text-left">
-                                    Expected Life Span
-                                  </th>
-                                  <th className="border px-4 py-2 text-left">
-                                    Description
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {result.fruit_vegetable_details.map(
-                                  (product, i) => (
-                                    <tr key={i} className="text-gray-300">
-                                      <td className="border px-4 py-2">
-                                        {product.name}
-                                      </td>
+                      {/* Right Side: Product Matching Table */}
+                      <div className="space-y-4">
+                        <div className="border-b pb-4 border-gray-600">
+                          <h4 className="text-[white]  mb-2 text-center">
+                            Image Details
+                          </h4>
+                          <table className="w-full table-auto border-collapse border border-gray-600">
+                            <thead>
+                              <tr className="bg-[#33353d] text-[white]">
+                                <th className="border px-4 py-2 text-left">
+                                  fruit Name
+                                </th>
 
-                                      <td className="border px-4 py-2">
-                                        {product.freshness_index}
-                                      </td>
-                                      <td className="border px-4 py-2">
-                                        {product.expected_life_span}
-                                      </td>
-                                      <td className="border px-4 py-2">
-                                        {product.description}
-                                      </td>
-                                    </tr>
-                                  )
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
+                                <th className="border px-4 py-2 text-left">
+                                  Freshness Index
+                                </th>
+                                <th className="border px-4 py-2 text-left">
+                                  Expected Life Span
+                                </th>
+                                <th className="border px-4 py-2 text-left">
+                                  Description
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {result.fruit_vegetable_details.map(
+                                (product, i) => (
+                                  <tr key={i} className="text-gray-300">
+                                    <td className="border px-4 py-2">
+                                      {product.name}
+                                    </td>
 
-                          {/* {allMatched && (
+                                    <td className="border px-4 py-2">
+                                      {product.freshness_index}
+                                    </td>
+                                    <td className="border px-4 py-2">
+                                      {product.expected_life_span}
+                                    </td>
+                                    <td className="border px-4 py-2">
+                                      {formatDescription(product.description).map(
+                                        (point, index) => (
+                                          <p key={index}>
+                                            {index + 1}. {point.trim()}
+                                          </p>
+                                        )
+                                      )}
+                                    </td>
+                                  </tr>
+                                )
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* {allMatched && (
             <div className="text-center text-[green] font-semibold">
               <h3>Order processed successfully!</h3>
             </div>
@@ -539,130 +530,129 @@ const Home = () => {
               <h3>Order Incomplete!</h3>
             </div>
           )} */}
-                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div>
-              {savedResults.map((result, index) => (
-                <div
-                  key={index}
-                  className={
-                    result.isNew
-                      ? "border border-[#494949]  rounded-md m-4 "
-                      : "border border-gray-600  m-6 rounded-md"
-                  }
-                >
-                  <div className="flex justify-between text-[white] border-b-[2px] border-[#35363f] p-4 bg-[#1e1f24]">
-                    <div className="flex ">
-                      <h3 className="font-bold text-[1rem]">
-                      Order Number: {generateOrderNumber()}
-                      </h3>
-                      <h3 className="text-xl font-semibold ml-5 text-[1rem]">
-                        Time Stamp: {result.product_details[0].timestamp}
-                      </h3>
-                    </div>
-                    <button
-                      onClick={() => toggleExpand(index)}
-                      className="text-blue-400"
-                    >
-                      {expandedIndices.includes(index) ? (
-                        <TbWindowMinimize className="text-[1.5rem]" />
-                      ) : (
-                        <IoMdExpand className="text-[1.5rem]" />
-                      )}
-                    </button>
                   </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div>
+            {savedResults.map((result, index) => (
+              <div
+                key={index}
+                className={
+                  result.isNew
+                    ? "border border-[#494949]  rounded-md m-4 "
+                    : "border border-gray-600  m-6 rounded-md"
+                }
+              >
+                <div className="flex justify-between text-[white] border-b-[2px] border-[#35363f] p-4 bg-[#1e1f24]">
+                  <div className="flex ">
+                    <h3 className="font-bold text-[1rem]">
+                      Order Number: {generateOrderNumber()}
+                    </h3>
+                    <h3 className="text-xl font-semibold ml-5 text-[1rem]">
+                      Time Stamp: {result.product_details[0].timestamp}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => toggleExpand(index)}
+                    className="text-blue-400"
+                  >
+                    {expandedIndices.includes(index) ? (
+                      <TbWindowMinimize className="text-[1.5rem]" />
+                    ) : (
+                      <IoMdExpand className="text-[1.5rem]" />
+                    )}
+                  </button>
+                </div>
 
-                  {expandedIndices.includes(index) && (
-                    <div className="p-4 bg-[#1e1f24]">
-                      <div className="grid grid-cols-[1fr,2fr] gap-6 ">
-                        <div className="space-y-4 border-r-[1px] pr-4 border-gray-600">
-                          <div className="border-b-[1px] pb-4 border-gray-600">
-                            {result.image && (
-                              <div className="">
-                                <img
-                                  src={result.image}
-                                  alt="Uploaded"
-                                  className="w-64 h-64 object-contain mx-auto rounded-md"
-                                />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Order Number */}
-                         
+                {expandedIndices.includes(index) && (
+                  <div className="p-4 bg-[#1e1f24]">
+                    <div className="grid grid-cols-[1fr,2fr] gap-6 ">
+                      <div className="space-y-4 border-r-[1px] pr-4 border-gray-600">
+                        <div className="border-b-[1px] pb-4 border-gray-600">
+                          {result.image && (
+                            <div className="">
+                              <img
+                                src={result.image}
+                                alt="Uploaded"
+                                className="w-64 h-64 object-contain mx-auto rounded-md"
+                              />
+                            </div>
+                          )}
                         </div>
 
-                        {/* Right Side: Product Matching Table */}
-                        <div className="space-y-4">
-                          <div className="border-b pb-4 border-gray-600">
-                            <h4 className="text-[white]  mb-2 text-center">
-                              Image Details
-                            </h4>
-                            <table className="w-full table-auto border-collapse border border-gray-600">
-                              <thead>
-                                <tr className="bg-[#33353d]">
-                                  <th className="border px-4 py-2 text-left">
-                                    Product Name
-                                  </th>
+                        {/* Order Number */}
+                      </div>
 
-                                  <th className="border px-4 py-2 text-left">
-                                    Brand
-                                  </th>
-                                  <th className="border px-4 py-2 text-left">
-                                    MRP
-                                  </th>
-                                  <th className="border px-4 py-2 text-left">
-                                    Quantity
-                                  </th>
-                                  <th className="border px-4 py-2 text-left">
-                                    Expired
-                                  </th>
-                                  <th className="border px-4 py-2 text-left">
-                                    Expiry Date
-                                  </th>
-                                  <th className="border px-4 py-2 text-left">
-                                    Expected Life Span
-                                  </th>
+                      {/* Right Side: Product Matching Table */}
+                      <div className="space-y-4">
+                        <div className="border-b pb-4 border-gray-600">
+                          <h4 className="text-[white]  mb-2 text-center">
+                            Image Details
+                          </h4>
+                          <table className="w-full table-auto border-collapse border border-gray-600">
+                            <thead>
+                              <tr className="bg-[#33353d]">
+                                <th className="border px-4 py-2 text-left">
+                                  Product Name
+                                </th>
+
+                                <th className="border px-4 py-2 text-left">
+                                  Brand
+                                </th>
+                                <th className="border px-4 py-2 text-left">
+                                  MRP
+                                </th>
+                                <th className="border px-4 py-2 text-left">
+                                  Quantity
+                                </th>
+                                <th className="border px-4 py-2 text-left">
+                                  Expired
+                                </th>
+                                <th className="border px-4 py-2 text-left">
+                                  Expiry Date
+                                </th>
+                                <th className="border px-4 py-2 text-left">
+                                  Expected Life Span
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {result.product_details.map((product, i) => (
+                                <tr key={i} className="text-gray-300">
+                                  <td className="border px-4 py-2">
+                                    {product.product_name}
+                                  </td>
+
+                                  <td className="border px-4 py-2">
+                                    {product.brand}
+                                  </td>
+                                  <td className="border px-4 py-2">
+                                    {product.MRP}
+                                  </td>
+                                  <td className="border px-4 py-2">
+                                    {product.product_count}
+                                  </td>
+                                  <td className="border px-4 py-2">
+                                    {product.is_expired}
+                                  </td>
+                                  <td className="border px-4 py-2">
+                                    {product.expiry_date}
+                                  </td>
+                                  <td className="border px-4 py-2">
+                                    {product.expected_life_span}
+                                  </td>
                                 </tr>
-                              </thead>
-                              <tbody>
-                                {result.product_details.map((product, i) => (
-                                  <tr key={i} className="text-gray-300">
-                                    <td className="border px-4 py-2">
-                                      {product.product_name}
-                                    </td>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
 
-                                    <td className="border px-4 py-2">
-                                      {product.brand}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                      {product.MRP}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                      {product.product_count}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                      {product.is_expired}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                      {product.expiry_date}
-                                    </td>
-                                    <td className="border px-4 py-2">
-                                      {product.expected_life_span}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-
-                          {/* {allMatched && (
+                        {/* {allMatched && (
                       <div className="text-center text-[green] font-semibold">
                         <h3>Order processed successfully!</h3>
                       </div>
@@ -672,74 +662,15 @@ const Home = () => {
                         <h3>Order Incomplete!</h3>
                       </div>
                     )} */}
-                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="max-w-7.5xl h-[100vh] mx-auto p-6 bg-[#141517] text-[#f0f0f0] flex shadow-md">
         <div className="flex flex-col pr-10 border-r-[1px] border-[#4d4d4d]">
@@ -968,7 +899,6 @@ const Home = () => {
         )}
 
         {/* Render saved results */}
-        
       </div>
     </div>
   );
