@@ -23,8 +23,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 const name = localStorage.getItem("name");
 
-//const backend_url="https://flipkart-grid-backend-2.onrender.com";
-const backend_url = "http://localhost:3001";
+const backend_url="https://flipkart-grid-backend-2.onrender.com";
+//const backend_url = "http://localhost:3001";
 
 const Home = () => {
   const [selectedFile, setSelectedFile] = useState(null);
