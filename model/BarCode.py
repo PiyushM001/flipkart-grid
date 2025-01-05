@@ -1,46 +1,23 @@
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from ultralytics import YOLO
+import cv2
+from pyzbar.pyzbar import decode
+import numpy as np
+import io
+from starlette.responses import StreamingResponse
+from PIL import Image
 import uvicorn
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-import google.generativeai as genai
-import tempfile
-import json
-from datetime import datetime
-import os
 
-# Configure the Gemini API key
-api_key = os.getenv('AIzaSyBXC_o3DTYBLbVBOLoQHCOQtXVA_DCqp-o')  # Better to use environment variable
-genai.configure(api_key=api_key)
-
-# Initialize FastAPI app
 app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-def upload_image(image_bytes):
-    """
-    Save uploaded image bytes and return file for Gemini processing
-    """
-    try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
-            temp_file.write(image_bytes)
-            temp_file_path = temp_file.name
-        
-        sample_file = genai.upload_file(temp_file_path)
-        return sample_file
-    except Exception as e:
-        print(f"Error uploading image: {e}")
-        return None
-    finally:
-        # Clean up temporary file
-        if 'temp_file_path' in locals():
-            os.remove(temp_file_path)
+# Load the YOLO model
+model = YOLO('/content/barcode.pt')
 
-            def detect_blur(image):
+
+
+def detect_blur(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
     return laplacian_var < 100  # Threshold for blur detection
@@ -118,150 +95,85 @@ def preprocess_image(image):
 
     return image
 
-def detect_and_decode_barcode(sample_file):
-    """
-    Use Gemini to detect and decode barcodes in the image
-    """
+
+# Function to rotate the image by a given angle
+def rotate_image(image, angle):
+    (h, w) = image.shape[:2]
+    center = (w // 2, h // 2)
+
+    # Generate a rotation matrix
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+
+    # Perform the rotation
+    rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=(255, 255, 255))
+    return rotated
+
+# Function to decode barcodes from a rotated image
+def decode_rotated_barcode(region):
+    for angle in range(0, 360, 30):  # Rotate in 30-degree intervals
+        rotated_region = rotate_image(region, angle)
+
+        # Convert to grayscale and preprocess
+        gray = cv2.cvtColor(rotated_region, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        # Decode barcodes
+        detected_barcodes = decode(thresh)
+        if detected_barcodes:
+            for barcode in detected_barcodes:
+                if barcode.data:
+                    return {
+                        "data": barcode.data.decode('utf-8'),
+                        "type": barcode.type,
+                        "angle": angle
+                    }
+    return None
+
+# API route for barcode detection
+@app.post("/detect-barcodes/")
+async def detect_barcodes(file: UploadFile = File(...)):
     try:
-        model = genai.GenerativeModel(model_name="gemini-1.5-pro")
-        
-        prompt = """Analyze this image for barcodes and provide the following details in JSON format:
-        1. Detect all barcodes (1D barcodes, QR codes, etc.)
-        2. For each detected barcode provide:
-           - Type of barcode (1D, QR, EAN-13, etc.)
-           - Decoded content/number
-           - Location description in the image
-           - Estimated scan quality (clear/blurry)
-           
-        Return the results in this JSON format:
-        {
-            "barcodes": [
-                {
-                    "type": "EAN-13",
-                    "content": "1234567890123",
-                    "location": "center of image",
-                    "quality": "clear"
-                }
-            ]
-        }
-        
-        If no barcodes are found, return an empty barcodes array. Focus only on actual barcodes, not text or numbers that aren't barcodes."""
+        # Read the uploaded image file
+        file_bytes = await file.read()
+        image = np.array(Image.open(io.BytesIO(file_bytes)))
 
-        response = model.generate_content([sample_file, prompt])
-        response_text = response.text.strip()
-        
-        # Clean up response if it contains markdown code blocks
-        if response_text.startswith("```json"):
-            response_text = response_text[7:-3].strip()
-            
-        result = json.loads(response_text)
-        
-        # Add timestamps to each barcode detection
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " +5:30"  # IST timezone
-        for barcode in result.get("barcodes", []):
-            barcode["timestamp"] = timestamp
-            
-        return result
-        
+        # Run inference on the image
+        results = model(image)
+
+        # Process the results
+        response_data = []
+        for r in results:
+            boxes = r.boxes.xyxy.cpu().numpy()
+
+            for idx, box in enumerate(boxes):
+                x1, y1, x2, y2 = map(int, box)
+                barcode_region = image[y1:y2, x1:x2]
+
+                # Attempt to decode barcode with rotation
+                decoded = decode_rotated_barcode(barcode_region)
+                if decoded:
+                    response_data.append({
+                        "barcode_index": idx + 1,
+                        "coordinates": {"x1": x1, "y1": y1, "x2": x2, "y2": y2},
+                        "barcode_data": decoded
+                    })
+
+        if not response_data:
+            return JSONResponse(
+                content={"message": "No barcodes were successfully decoded."},
+                status_code=404
+            )
+
+        return {"detected_barcodes": response_data}
+
     except Exception as e:
-        print(f"Error in barcode detection: {e}")
-        return {"barcodes": []}
+        raise HTTPException(status_code=500, detail=str(e))
 
-def verify_barcode_format(barcode_content):
-    """
-    Use Gemini to verify if the detected barcode content follows proper format
-    """
-    try:
-        model = genai.GenerativeModel(model_name="gemini-1.5-pro")
-        
-        verify_prompt = f"""For the barcode content "{barcode_content}", verify:
-        1. If it follows standard barcode format
-        2. Check digit validity if applicable
-        3. Identify the barcode standard (EAN-13, UPC-A, etc.)
-        
-        Return result in JSON format:
-        {{
-            "is_valid": true/false,
-            "format": "barcode standard name",
-            "validation_details": "explanation of validity"
-        }}
+# Root endpoint
+@app.get("/")
+def root():
+    return {"message": "Barcode Detection API is running. Use /detect-barcodes/ endpoint to detect barcodes."}
 
-        response = model.generate_content(verify_prompt)
-        response_text = response.text.strip()
-        
-        # Clean up response if it contains markdown code blocks
-        if response_text.startswith("```json"):
-            response_text = response_text[7:-3].strip()
-            
-        return json.loads(response_text)
-    except Exception as e:
-        print(f"Error in barcode verification: {e}")
-        return {
-            "is_valid": False,
-            "format": "unknown",
-            "validation_details": f"Failed to verify format: {str(e)}"
-        }
-
-@app.get('/')
-def index():
-    return {'message': 'Gemini Barcode Scanner API - Send an image to /scan'}
-
-@app.post('/scan')
-async def scan_barcode(file: UploadFile = File(...)):
-    try:
-        contents = await file.read()
-        sample_file = upload_image(contents)
-        
-        if not sample_file:
-            return {"error": "Failed to upload the image"}
-        
-        # Detect and decode barcodes
-        result = detect_and_decode_barcode(sample_file)
-        
-        # Verify each detected barcode
-        for barcode in result.get("barcodes", []):
-            validation = verify_barcode_format(barcode["content"])
-            barcode["validation"] = validation
-        
-        return {
-            "filename": file.filename,
-            "message": "Barcode scanning completed",
-            "results": result
-        }
-        
-    except Exception as e:
-        return {"error": str(e)}
-
-@app.post('/scan-batch')
-async def scan_multiple(files: list[UploadFile] = File(...)):
-    try:
-        results = []
-        for file in files:
-            contents = await file.read()
-            sample_file = upload_image(contents)
-            
-            if sample_file:
-                # Detect and decode barcodes
-                result = detect_and_decode_barcode(sample_file)
-                
-                # Verify each detected barcode
-                for barcode in result.get("barcodes", []):
-                    validation = verify_barcode_format(barcode["content"])
-                    barcode["validation"] = validation
-                
-                results.append({
-                    "filename": file.filename,
-                    "results": result
-                })
-            
-        return {
-            "message": "Batch processing completed",
-            "batch_results": results
-        }
-        
-    except Exception as e:
-        return {"error": str(e)}
-
-if __name__ == '__main__':
-    port = int(os.getenv('PORT', 8000))
-    uvicorn.run(app, host='0.0.0.0', port=port)
+# Run the app locally if this script is the main program
+if name == "main":
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
