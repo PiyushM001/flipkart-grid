@@ -103,9 +103,8 @@ const Barcode = () => {
   };
   
 
-  const handleSubmit = async (event) => {
+  const handleSubmit2 = async (event) => {
     setanimatep("loaderscan relative");
-
     event.preventDefault();
 
     if (!selectedFile) {
@@ -221,6 +220,7 @@ const Barcode = () => {
             {/* <img className="w-[10rem]" src={robot}></img>{" "} */}
             <h1 className="text-center text-2xl font-bold  ml-5 mt-4">
               Hi , {name}!
+              <p>barcode</p>
             </h1>
           </div>
 
@@ -228,7 +228,7 @@ const Barcode = () => {
             <div className="flex justify-center mb-4"></div>
 
             <form
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit2}
               className="mb-6 flex mt-10 flex-col items-center"
             >
               {/* <h1 className='m-2'>Grocery</h1> */}
