@@ -41,6 +41,11 @@ const Nutrition = () => {
 
   const [animatep, setanimatep] = useState("relative");
   const [activeForm, setActiveForm] = useState("grocery");
+  const videoConstraints = {
+    width: 1920, // Set high resolution
+    height: 1080,
+    facingMode: "user", // Use "environment" for back camera on mobile
+  };
 
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   // const [currentBatchIndex, setCurrentBatchIndex] = useState(0); // Track the current batch
@@ -247,6 +252,7 @@ const Nutrition = () => {
                     audio={false}
                     ref={webcamRef}
                     screenshotFormat="image/jpeg"
+                      videoConstraints={videoConstraints}
                     className="w-64 h-64 object-contain border border-gray-600"
                   />
                   <button

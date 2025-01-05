@@ -21,8 +21,8 @@ import imgflip from "../images/flipkart2.jpg";
 import { Link , useNavigate} from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import NutritionInfo from "./nutritiontable";
+import BarcodeInfo from "./barcodetable";
 const name = localStorage.getItem("name");
- const backend_url="https://flipkart-grid-backend-2.onrender.com";
 //const backend_url = "http://localhost:3001";
 
 const Barcode = () => {
@@ -39,7 +39,6 @@ const Barcode = () => {
 
 
   const [animatep, setanimatep] = useState("relative");
-  const [activeForm, setActiveForm] = useState("grocery");
 
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   // const [currentBatchIndex, setCurrentBatchIndex] = useState(0); // Track the current batch
@@ -73,20 +72,28 @@ const Barcode = () => {
     }
   };
 
-  const isValidResponseData = (data) => {
-    if (!Array.isArray(data)) {
+  const isValidBarcodeResponse = (data) => {
+    // Check if the data is an object and contains the "barcodes" array
+    if (
+      typeof data !== "object" || 
+      !("barcodes" in data) || 
+      !Array.isArray(data.barcodes)
+    ) {
       return false;
     }
   
-    for (const item of data) {
+    // Validate each item in the "barcodes" array
+    for (const barcode of data.barcodes) {
       if (
-        typeof item !== "object" || 
-        !("Nutrient" in item) || 
-        !("Value" in item) || 
-        !("Ingredient" in item) || 
-        typeof item.Nutrient !== "string" || 
-        typeof item.Value !== "string" || 
-        typeof item.Ingredient !== "string"
+        typeof barcode !== "object" || 
+        !("type" in barcode) || 
+        !("content" in barcode) || 
+        !("location" in barcode) || 
+        !("quality" in barcode) || 
+        typeof barcode.type !== "string" || 
+        typeof barcode.content !== "string" || 
+        typeof barcode.location !== "string" || 
+        typeof barcode.quality !== "string"
       ) {
         return false;
       }
@@ -113,7 +120,7 @@ const Barcode = () => {
     setLoading(true);
     try {
         const res = await axios.post(
-          "https://nutrition-info.onrender.com/predict",
+          "https://barcode-scanner-181y.onrender.com/scan",
           
           formData,
           {
@@ -123,17 +130,17 @@ const Barcode = () => {
           }
         );
       
-        if (res.data.product_details) {
+        if (res.data) {
 
-            if(isValidResponseData(res.data.product_details)){
-                setResponse(res.data.product_details);
+            if(isValidBarcodeResponse(res.data)){
+                setResponse(res.data);
 
             }
             else{
                 toast.error("Please give valid image, where details can be extracted")
             }
           
-          console.log(res.data.product_details);
+          
           setImage(null);
         } else {
           toast.error("Error: No relevant product details found.");
@@ -203,7 +210,7 @@ const Barcode = () => {
         <img className="" src={imgflip}></img>
 
         <div className="m-[5rem] ">
-            {response &&  <NutritionInfo image={image2} data={response} /> }
+            {response &&  <BarcodeInfo image={image2} data={response} /> }
         
         </div>
       </div>
